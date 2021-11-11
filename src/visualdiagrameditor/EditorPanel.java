@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -14,20 +16,19 @@ import visualdiagrameditor.shapes.Oval;
 import visualdiagrameditor.shapes.Rectangle;
 
 
-public class EditorPanel extends JPanel implements MouseMotionListener, MouseListener{
+public class EditorPanel extends JPanel implements MouseMotionListener, MouseListener, KeyListener {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public ArrayList<ComponentBase> elements = new ArrayList<ComponentBase>(); 
 	private ComponentBase selectedItem = null;
 	private Point lastMousePosition = new Point();
 	private int mouseState;
+	private final int moveStep = 25;
 	
 	public EditorPanel() {
 		addMouseMotionListener(this); 			// let the panel listen to its own mouse movements
 		addMouseListener(this); 				// let the panel listen to its own mouse clicks and drags
+		addKeyListener(this);
 	}
 	
 	
@@ -39,6 +40,9 @@ public class EditorPanel extends JPanel implements MouseMotionListener, MouseLis
 		}
 	}
 	
+	public void deleteSelectedItem() {
+		if(getSelectedItem() != null) {elements.remove(getSelectedItem());}
+	}
 	
 	@Override
 	public void mousePressed(MouseEvent arg0) {
@@ -79,9 +83,9 @@ public class EditorPanel extends JPanel implements MouseMotionListener, MouseLis
 		setSelectedItem(item); 	//remember that this is the item we've got selected now	
 	}
 	
-	public ComponentBase getSelectedItem() {
-		return selectedItem;
-	}
+	public void addElement(ComponentBase element) {elements.add(element);}
+	public void removeElement(ComponentBase element) {elements.remove(element);}
+	public ComponentBase getSelectedItem() {return selectedItem;}
 
 	public void setSelectedItem(ComponentBase selectedItem) {
 		if(this.getSelectedItem() != null) {
@@ -92,16 +96,11 @@ public class EditorPanel extends JPanel implements MouseMotionListener, MouseLis
 			getSelectedItem().setIsSelected(true);
 		}
 	}
-	
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-
-	}
-
+	public void mouseReleased(MouseEvent arg0) {}
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
-
 		//find out how far we've dragged on both axes
 		int mouseMovementX = arg0.getX() - lastMousePosition.x;
 		int mouseMovementY = arg0.getY() - lastMousePosition.y;
@@ -135,19 +134,37 @@ public class EditorPanel extends JPanel implements MouseMotionListener, MouseLis
 	@Override
 	public void mouseExited(MouseEvent arg0) {}
 
+	public int getMouseState() {return mouseState;}
+	public void setMouseState(int mouseState) {this.mouseState = mouseState;}
 
-	public void addElement(ComponentBase box) {
-		elements.add(box);
+	@Override
+	public void keyTyped(KeyEvent e) {}
+	@Override
+	public void keyReleased(KeyEvent e) {}	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		
+		if(getSelectedItem()!= null)
+		{
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_UP:
+				getSelectedItem().translate(0, -moveStep);;
+				break;
+			case KeyEvent.VK_DOWN:
+				getSelectedItem().translate(0, moveStep);;
+				break;
+			case KeyEvent.VK_LEFT:
+				getSelectedItem().translate(-moveStep,0);;
+				break;
+			case KeyEvent.VK_RIGHT:
+				getSelectedItem().translate( moveStep,0);;
+				break;
+			case KeyEvent.VK_DELETE:
+				removeElement(getSelectedItem());
+				break;
+			default:
+			}	
+			repaint();
+		}
 	}
-	
-	public int getMouseState() {
-		return mouseState;
-	}
-
-
-	public void setMouseState(int mouseState) {
-		this.mouseState = mouseState;
-	}
-
-	
 }

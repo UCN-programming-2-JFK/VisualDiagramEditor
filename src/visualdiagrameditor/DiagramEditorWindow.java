@@ -15,6 +15,8 @@ public class DiagramEditorWindow extends JFrame {
 		frame.setResizable(false); 									// lock its size
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 		// set the X button click to close the window
 		frame.setSize(1024, 768); 									// set the size
+		editorPanel.setFocusable(true);
+		editorPanel.grabFocus();
 		
 		frame.getContentPane().add(editorPanel); 					// add our panel
 		frame.setVisible(true); 									// show the window	
